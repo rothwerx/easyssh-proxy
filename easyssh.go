@@ -249,6 +249,18 @@ func (ssh_conf *MakeConfig) Connect() (*ssh.Session, *ssh.Client, error) {
 		return nil, nil, err
 	}
 
+	modes := ssh.TerminalModes{
+		ssh.ECHO:          0, // Disable echoing
+		ssh.TTY_OP_ISPEED: 14400,
+		ssh.TTY_OP_OSPEED: 14400,
+	}
+
+	if err := session.RequestPty("xterm", 80, 40, modes); err != nil {
+		session.Close()
+		fmt.Printf("request for psuedo terminal failed: %s", err)
+		return nil, nil, err
+	}
+
 	return session, client, nil
 }
 
